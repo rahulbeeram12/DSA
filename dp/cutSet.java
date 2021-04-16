@@ -85,7 +85,9 @@ public class cutSet {
         return dp[SI][EI];
     }
 
-    
+    public static int printMCM(){
+        return 0;
+    }
 
     public static void main(String args[]){
         long start = System.nanoTime();
