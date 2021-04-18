@@ -226,6 +226,64 @@ public class cutSet {
         return dp[0];
     }
 
+    // burst ballons leetcode 312
+    public int maxCoins(int arr[],int si,int ei,int dp[][]){
+        if(dp[si][ei] != -1) return dp[si][ei];
+        int lval = si - 1 == -1 ? 1 : nums[si - 1];
+        int rval = ei + 1 == nums.length ? 1 : nums[ei + 1];
+
+        int max = 0;
+        for(int cut = si; cut <= ei; cut++){
+            int lans = cut == si ? 0 : maxCoins(arr, si, cut - 1, dp);
+            int rans = cut == ei ? 0 : maxCoins(arr, cut + 1, ei, dp);
+            
+            max = Math.max(max,lans + lval * arr[cut] * rval + rans);
+        }
+
+        return dp[si][ei] = max;
+    }
+
+    public int maxCoins(int nums[]){
+        int n = nums.length;
+        int dp[][] = new int[n][n];
+        for(int d[] : dp) Arrays.fill(d,-1);
+        return maxCoins(nums,0,n - 1,dp);
+    }
+
+    // 1039. Minimum Score Triangulation of Polygon
+    public int minScoreTriangulation(int[] arr, int si, int ei, int dp[][]) {
+        if (ei - si <= 1) {
+            return dp[si][ei] = 0;
+        }
+
+        if (ei - si == 2) {
+            return dp[si][ei] = arr[si] * arr[si + 1] * arr[ei];
+        }
+
+        if (dp[si][ei] != 0)
+            return dp[si][ei];
+
+        int min = (int) 1e9;
+        for (int cut = si + 1; cut < ei; cut++) {
+            int lans = minScoreTriangulation(arr, si, cut, dp);
+            int rans = minScoreTriangulation(arr, cut, ei, dp);
+
+            min = Math.min(min, lans + arr[si] * arr[cut] * arr[ei] + rans);
+        }
+
+        return dp[si][ei] = min;
+    }
+
+    public int minScoreTriangulation(int[] values) {
+        int n = values.length;
+        int dp[][] = new int[n][n];
+        // for(int d[] : dp) Arrays.fill(d,-1);
+        int ans = minScoreTriangulation(values, 0, n - 1, dp);
+        return ans;
+    }
+
+    // boolean parenthization
+    
     public static void main(String args[]){
         long start = System.nanoTime();
 
