@@ -283,7 +283,68 @@ public class cutSet {
     }
 
     // boolean parenthization
-    
+    public static class pairboolean {
+        int trueways = 0;
+        int falseways = 0;
+
+        public pairboolean() {
+        }
+
+        public pairboolean(int trueways, int falseways) {
+            this.trueways = trueways;
+            this.falseways = falseways;
+        }
+    }
+
+    static int mod = 1003;
+
+    public static pairboolean evaluate_(pairboolean left, pairboolean right, char op) {
+        int total = ((left.trueways + left.falseways) % mod * (right.trueways + right.falseways) % mod) % mod;
+
+        pairboolean ans = new pairboolean();
+
+        if (op == '|') {
+            ans.falseways = (left.falseways * right.falseways) % mod;
+            ans.trueways = (total - ans.falseways + mod) % mod;
+        } else if (op == '&') {
+            ans.trueways = (left.trueways * right.trueways) % mod;
+            ans.falseways = (total - ans.trueways + mod) % mod;
+        } else {
+            ans.trueways = ((left.falseways * right.trueways) % mod + (left.trueways * right.falseways) % mod) % mod;
+            ans.falseways = (total - ans.trueways + mod) % mod;
+        }
+
+        return ans;
+    }
+
+    public static pairboolean getWays(String s, int si, int ei, pairboolean dp[][]) {
+        if (si == ei) {
+            char ch = s.charAt(si);
+            return dp[si][ei] = new pairboolean(ch == 'T' ? 1 : 0, ch == 'F' ? 1 : 0);
+        }
+
+        if (dp[si][ei] != null)
+            return dp[si][ei];
+
+        pairboolean ans = new pairboolean(0, 0);
+        for (int cut = si + 1; cut < ei; cut += 2) {
+            pairboolean lways = getWays(s, si, cut - 1, dp);
+            pairboolean rways = getWays(s, cut + 1, ei, dp);
+
+            pairboolean res = evaluate_(lways, rways, s.charAt(cut));
+            ans.trueways = (ans.trueways + res.trueways) % mod;
+            ans.falseways = (ans.falseways + res.falseways) % mod;
+        }
+
+        return dp[si][ei] = ans;
+    }
+
+    public static int countWays(int N, String S) {
+        int n = S.length();
+        pairboolean dp[][] = new pairboolean[n][n];
+        return getWays(S, 0, n - 1, dp).trueways;
+    }
+
     public static void main(String args[]){
         long start = System.nanoTime();
 
