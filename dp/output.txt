@@ -1,2 +1,5 @@
-1140000
-Execution Time : 0ms
+Minimum value : 27
+Minimum Expression : (1 + ((2 * 3) + (4 * 5)))
+Maximum value : 105
+Maximum Expression : ((1 + 2) * ((3 + 4) * 5))
+Execution Time : 135ms

@@ -85,14 +85,151 @@ public class cutSet {
         return dp[SI][EI];
     }
 
-    public static int printMCM(){
-        return 0;
+    // public static int print_MCM(int arr[],int si,int ei){
+        
+    // }
+
+    // min max evalution    
+    public static class pair {
+        int minValue = (int)1e9;
+        int maxValue = -(int)1e9;
+
+        String minExpression = "";
+        String maxExpression = "";
+
+        public pair (){
+        }
+
+        public pair (int minValue,int maxValue){
+            this.minValue = minValue;
+            this.maxValue = maxValue;
+        }
+
+        public pair(int minValue, int maxValue, String minExpression,String maxExpression) {
+            this.minValue = minValue;
+            this.maxValue = maxValue;
+            this.minExpression = minExpression;
+            this.maxExpression = maxExpression;
+        }
+    }
+
+    public static int evaluate(int a,int b,char op){
+        return op == '+' ? a + b : a * b;
+    }
+
+    public static pair minMaxEval(String s,int si,int ei,pair dp[][]){
+        if(si == ei){
+            int num = s.charAt(si) - '0';
+            return dp[si][ei] = new pair(num,num,num + "",num + "");
+        }
+
+        if(dp[si][ei] != null) return dp[si][ei];
+        
+        pair res = new pair();
+        for(int cut = si + 1; cut < ei; cut += 2){
+            pair lans = minMaxEval(s, si, cut - 1, dp);
+            pair rans = minMaxEval(s, cut + 1, ei, dp);
+
+            int min = evaluate(lans.minValue,rans.minValue,s.charAt(cut));
+            int max = evaluate(lans.maxValue,rans.maxValue,s.charAt(cut));    
+
+            // res.minValue = Math.min(res.minValue,min);
+            // res.maxValue = Math.max(res.maxValue,max);
+
+            if(min < res.minValue){
+                res.minValue = min;
+                res.minExpression = "(" + lans.minExpression + " " + s.charAt(cut) + " " + rans.minExpression + ")";
+            }
+
+            if (max > res.maxValue) {
+                res.maxValue = max;
+                res.maxExpression = "(" + lans.maxExpression + " " + s.charAt(cut) + " " + rans.maxExpression + ")";
+            }
+        }
+
+        return dp[si][ei] = res;
+    }
+
+    public static void minMaxUtil(String s){
+        int n = s.length();
+        pair dp[][] = new pair[n][n];
+        pair res = minMaxEval(s, 0, n - 1, dp);
+
+        System.out.println("Minimum value : " + res.minValue);
+        System.out.println("Minimum Expression : " + res.minExpression);
+
+        System.out.println("Maximum value : " + res.maxValue);
+        System.out.println("Maximum Expression : " + res.maxExpression);
+    }
+
+    // palindromic partitioning 2
+    public static int getAns(String s, int si, boolean[][] isPalindrome, int dp[]) {
+        if (isPalindrome[si][s.length() - 1]) {
+            return dp[si] = 0;
+        }
+
+        if (dp[si] != -1)
+            return dp[si];
+
+        int min = (int) 1e9;
+        for (int cut = si; cut < s.length(); cut++) {
+            if (isPalindrome[si][cut]) {
+                min = Math.min(min, getAns(s, cut + 1, isPalindrome, dp) + 1);
+            }
+        }
+
+        return dp[si] = min;
+    }
+
+    public int minCut(String s) {
+        int n = s.length();
+        boolean isPalindrome[][] = new boolean[n][n];
+
+        for (int gap = 0; gap < s.length(); gap++) {
+            for (int i = 0, j = gap; j < s.length(); i++, j++) {
+                if (i == j)
+                    isPalindrome[i][j] = true;
+                else if (gap == 1)
+                    isPalindrome[i][j] = (s.charAt(i) == s.charAt(j));
+                else
+                    isPalindrome[i][j] = (s.charAt(i) == s.charAt(j)) && isPalindrome[i + 1][j - 1];
+            }
+        }
+
+        int dp[] = new int[n];
+        Arrays.fill(dp, -1);
+
+        return getAns(s, 0, isPalindrome, dp);
+    }
+
+    //using tabulation
+    public static int palindromic_partitioning_2(String s,int [][]isPalindrome){
+        int n = s.length();
+        int dp[] = new int[n];
+        Arrays.fill(dp,-1);
+        for(int i = n - 1; i >= 0; i--){
+            if(isPalindrome[i][n - 1]){
+                dp[i] = 0;
+                continue;
+            }
+
+            int min = (int)1e9;
+            for(int cut = i ; cut < n; cut++){
+                if(isPalindrome[i][cut]){
+                    min = Math.min(min,dp[cut + 1] + 1);
+                }
+            }
+
+            dp[i] = min;
+        }
+
+        return dp[0];
     }
 
     public static void main(String args[]){
         long start = System.nanoTime();
 
-        System.out.println(mcm_tabu_followup(new int[] {40,20,30,10,30,40,50,60,70},0,8));
+        minMaxUtil("1+2*3+4*5");
 
         long end = System.nanoTime();
         System.out.println("Execution Time : " + (end - start) / 1000000 + "ms");
